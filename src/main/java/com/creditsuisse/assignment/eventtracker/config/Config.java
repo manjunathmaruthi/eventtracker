@@ -8,15 +8,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.DataSourceBuilder;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
+
 import javax.sql.DataSource;
 import java.io.File;
 
-@Configuration
+@Component
 public class Config {
 
 	private static final Logger logger = LoggerFactory.getLogger(Config.class);
@@ -25,7 +23,7 @@ public class Config {
 	@Autowired
 	private EventDBProperties eventDBProperties;
 
-	@Bean
+
 	public DataSource dataSource() {
 		DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
 		dataSourceBuilder.driverClassName(eventDBProperties.getDriverClassName());
@@ -35,7 +33,6 @@ public class Config {
 		return dataSourceBuilder.build();
 	}
 
-	@PostConstruct
 	public void startServer() {
 		if (server == null) {
 			server = new Server();
@@ -46,13 +43,13 @@ public class Config {
 						"file:../db" + File.separator + "HSQLDatabase" + File.separator + eventDBProperties.getDbname());
 				server.setSilent(false);
 				server.start();
+				logger.info("Server started... ");
 			} catch (Exception ex) {
 				logger.warn("Exception during startup ", ex);
 			}
 		}
 	}
 
-	@PreDestroy
 	public void shutdownServer() {
 		if (server.getState() == ServerConstants.SERVER_STATE_ONLINE) {
 			server.shutdown();
