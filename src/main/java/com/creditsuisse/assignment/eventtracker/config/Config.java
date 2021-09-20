@@ -8,9 +8,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.DataSourceBuilder;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 import java.io.File;
 
@@ -24,6 +27,7 @@ public class Config {
 	private EventDBProperties eventDBProperties;
 
 
+	@Bean
 	public DataSource dataSource() {
 		DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
 		dataSourceBuilder.driverClassName(eventDBProperties.getDriverClassName());
@@ -33,6 +37,7 @@ public class Config {
 		return dataSourceBuilder.build();
 	}
 
+	@PostConstruct
 	public void startServer() {
 		if (server == null) {
 			server = new Server();
@@ -50,6 +55,7 @@ public class Config {
 		}
 	}
 
+	@PreDestroy
 	public void shutdownServer() {
 		if (server.getState() == ServerConstants.SERVER_STATE_ONLINE) {
 			server.shutdown();

@@ -14,25 +14,20 @@ public class EventtrackerApplication implements CommandLineRunner {
 
 	private static final Logger logger = LoggerFactory.getLogger(EventtrackerApplication.class);
 
-	@Autowired
-	private Config config;
 
 	@Autowired
 	private EventLogParserService eventLogParserService;
 
 	public static void main(String[] args) {
+		if(args.length == 0){
+			logger.error("No commandline arugments found...");
+			return;
+		}
 		SpringApplication.run(EventtrackerApplication.class, args);
 	}
 
 	@Override
 	public void run(String... args) throws Exception {
-		if(args.length == 0){
-			logger.error("No commandline arugments found...");
-			return;
-		}
-		config.startServer();
-		config.dataSource();
 		eventLogParserService.parser(args[0]);
-		config.shutdownServer();
 	}
 }
